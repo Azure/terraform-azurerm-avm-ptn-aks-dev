@@ -1,8 +1,125 @@
-# TODO: Replace this dummy resource azurerm_resource_group.TODO with your module resource
-resource "azurerm_resource_group" "TODO" {
-  location = var.location
-  name     = var.name # calling code must supply the name
-  tags     = var.tags
+
+resource "random_string" "acr_suffix" {
+  length  = 8
+  numeric = true
+  special = false
+  upper   = false
+}
+
+resource "azurerm_container_registry" "this" {
+  location            = var.location
+  name                = "cr${random_string.acr_suffix.result}"
+  resource_group_name = var.resource_group_name
+  sku                 = "Premium"
+  tags                = var.tags
+}
+
+resource "azurerm_role_assignment" "acr" {
+  principal_id                     = azurerm_kubernetes_cluster.this.kubelet_identity[0].object_id
+  scope                            = azurerm_container_registry.this.id
+  role_definition_name             = "AcrPull"
+  skip_service_principal_aad_check = true
+}
+
+resource "azurerm_user_assigned_identity" "aks" {
+  count = length(var.user_assigned_resource_ids) > 0 ? 0 : 1
+
+  location            = var.location
+  name                = "uami-aks"
+  resource_group_name = var.resource_group_name
+  tags                = var.tags
+}
+
+resource "azurerm_kubernetes_cluster" "this" {
+  location                          = var.location
+  name                              = "aks-${var.name}"
+  resource_group_name               = var.resource_group_name
+  automatic_channel_upgrade         = "patch"
+  dns_prefix                        = var.name
+  kubernetes_version                = var.kubernetes_version
+  node_os_channel_upgrade           = "NodeImage"
+  oidc_issuer_enabled               = true
+  role_based_access_control_enabled = true
+  sku_tier                          = "Free"
+  tags                              = var.tags
+  workload_identity_enabled         = true
+
+  default_node_pool {
+    name                   = "agentpool"
+    vm_size                = "Standard_DS2_v2"
+    enable_auto_scaling    = true
+    enable_host_encryption = true
+    max_count              = 5
+    max_pods               = 110
+    min_count              = 2
+    orchestrator_version   = var.orchestrator_version
+    os_sku                 = "Ubuntu"
+    tags                   = merge(var.tags, var.agents_tags)
+
+    upgrade_settings {
+      max_surge = "10%"
+    }
+  }
+
+  azure_active_directory_role_based_access_control {
+    admin_group_object_ids = var.rbac_aad_admin_group_object_ids
+    azure_rbac_enabled     = var.rbac_aad_azure_rbac_enabled
+    managed                = true
+    tenant_id              = var.rbac_aad_tenant_id
+  }
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = length(var.user_assigned_resource_ids) > 0 ? var.user_assigned_resource_ids : azurerm_user_assigned_identity.aks[*].id
+  }
+
+  network_profile {
+    network_plugin    = "kubenet"
+    load_balancer_sku = "basic"
+    network_policy    = "calico"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      kubernetes_version
+    ]
+
+    precondition {
+      condition     = var.kubernetes_version == null || try(can(regex("^[0-9]+\\.[0-9]+$", var.kubernetes_version)), false)
+      error_message = "Ensure that kubernetes_version does not specify a patch version"
+    }
+    precondition {
+      condition     = var.orchestrator_version == null || try(can(regex("^[0-9]+\\.[0-9]+$", var.orchestrator_version)), false)
+      error_message = "Ensure that orchestrator_version does not specify a patch version"
+    }
+  }
+}
+
+# The following null_resource is used to trigger the update of the AKS cluster when the kubernetes_version changes
+# This is necessary because the azurerm_kubernetes_cluster resource ignores changes to the kubernetes_version attribute
+# because AKS patch versions are upgraded automatically by Azure
+# The kubernetes_version_keeper and aks_cluster_post_create resources implement a mechanism to force the update
+# when the minor kubernetes version changes in var.kubernetes_version
+
+resource "null_resource" "kubernetes_version_keeper" {
+  triggers = {
+    version = var.kubernetes_version
+  }
+}
+
+resource "azapi_update_resource" "aks_cluster_post_create" {
+  type = "Microsoft.ContainerService/managedClusters@2024-02-01"
+  body = jsonencode({
+    properties = {
+      kubernetesVersion = var.kubernetes_version
+    }
+  })
+  resource_id = azurerm_kubernetes_cluster.this.id
+
+  lifecycle {
+    ignore_changes       = all
+    replace_triggered_by = [null_resource.kubernetes_version_keeper.id]
+  }
 }
 
 # required AVM resources interfaces
@@ -11,19 +128,6 @@ resource "azurerm_management_lock" "this" {
 
   lock_level = var.lock.kind
   name       = coalesce(var.lock.name, "lock-${var.lock.kind}")
-  scope      = azurerm_MY_RESOURCE.this.id # TODO: Replace with your azurerm resource name
+  scope      = azurerm_kubernetes_cluster.this.id
   notes      = var.lock.kind == "CanNotDelete" ? "Cannot delete the resource or its child resources." : "Cannot delete or modify the resource or its child resources."
-}
-
-resource "azurerm_role_assignment" "this" {
-  for_each = var.role_assignments
-
-  principal_id                           = each.value.principal_id
-  scope                                  = azurerm_resource_group.TODO.id # TODO: Replace this dummy resource azurerm_resource_group.TODO with your module resource
-  condition                              = each.value.condition
-  condition_version                      = each.value.condition_version
-  delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
-  role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
-  role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
-  skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
 }

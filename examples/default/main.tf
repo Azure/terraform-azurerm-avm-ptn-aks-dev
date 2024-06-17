@@ -1,19 +1,23 @@
 terraform {
-  required_version = "~> 1.5"
+  required_version = ">= 1.3.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.74"
+      version = ">= 3.7.0, < 4.0.0"
     }
     random = {
       source  = "hashicorp/random"
-      version = "~> 3.5"
+      version = ">= 3.5.0, < 4.0.0"
     }
   }
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
 
 
@@ -21,7 +25,7 @@ provider "azurerm" {
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/regions/azurerm"
-  version = "~> 0.3"
+  version = ">= 0.3.0"
 }
 
 # This allows us to randomize the region for the resource group.
@@ -34,7 +38,7 @@ resource "random_integer" "region_index" {
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "~> 0.3"
+  version = ">= 0.3.0"
 }
 
 # This is required for resource modules
@@ -48,12 +52,10 @@ resource "azurerm_resource_group" "this" {
 # Leaving location as `null` will cause the module to use the resource group location
 # with a data source.
 module "test" {
-  source = "../../"
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
-  # ...
-  location            = azurerm_resource_group.this.location
-  name                = "TODO" # TODO update with module.naming.<RESOURCE_TYPE>.name_unique
+  source              = "../../"
+  kubernetes_version  = "1.28"
+  enable_telemetry    = var.enable_telemetry # see variables.tf
+  name                = module.naming.kubernetes_cluster.name_unique
   resource_group_name = azurerm_resource_group.this.name
-
-  enable_telemetry = var.enable_telemetry # see variables.tf
+  location            = "East US 2" # Hardcoded instead of using module.regions because The "for_each" map includes keys derived from resource attributes that cannot be determined until apply, and so Terraform cannot determine the full set of keys that will identify the instances of this resource.
 }
