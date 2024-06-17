@@ -62,15 +62,6 @@ variable "lock" {
   }
 }
 
-variable "user_assigned_resource_ids" {
-  type        = set(string)
-  default     = []
-  description = <<DESCRIPTION
-(Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
-  DESCRIPTION
-  nullable    = false
-}
-
 variable "orchestrator_version" {
   type        = string
   default     = null
@@ -100,4 +91,13 @@ variable "tags" {
   type        = map(string)
   default     = null
   description = "(Optional) Tags of the resource."
+}
+
+variable "user_assigned_resource_ids" {
+  type        = set(string)
+  default     = []
+  description = <<DESCRIPTION
+(Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
+  DESCRIPTION
+  nullable    = false
 }
