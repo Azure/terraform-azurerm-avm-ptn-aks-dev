@@ -8,7 +8,7 @@ resource "random_string" "acr_suffix" {
 
 resource "azurerm_container_registry" "this" {
   location            = var.location
-  name                = "cr${random_string.acr_suffix.result}"
+  name                = coalesce(var.container_registry_name, "cr${random_string.acr_suffix.result}")
   resource_group_name = var.resource_group_name
   sku                 = "Premium"
   tags                = var.tags
@@ -25,7 +25,7 @@ resource "azurerm_user_assigned_identity" "aks" {
   count = length(var.user_assigned_resource_ids) > 0 ? 0 : 1
 
   location            = var.location
-  name                = "uami-aks"
+  name                = coalesce(var.user_assigned_identity_name, "uami-aks")
   resource_group_name = var.resource_group_name
   tags                = var.tags
 }
@@ -80,26 +80,17 @@ resource "azurerm_kubernetes_cluster" "this" {
     ignore_changes = [
       kubernetes_version
     ]
-
-    precondition {
-      condition     = var.kubernetes_version == null || try(can(regex("^[0-9]+\\.[0-9]+$", var.kubernetes_version)), false)
-      error_message = "Ensure that kubernetes_version does not specify a patch version"
-    }
-    precondition {
-      condition     = var.orchestrator_version == null || try(can(regex("^[0-9]+\\.[0-9]+$", var.orchestrator_version)), false)
-      error_message = "Ensure that orchestrator_version does not specify a patch version"
-    }
   }
 }
 
-# The following null_resource is used to trigger the update of the AKS cluster when the kubernetes_version changes
+# The following terraform_data is used to trigger the update of the AKS cluster when the kubernetes_version changes
 # This is necessary because the azurerm_kubernetes_cluster resource ignores changes to the kubernetes_version attribute
 # because AKS patch versions are upgraded automatically by Azure
 # The kubernetes_version_keeper and aks_cluster_post_create resources implement a mechanism to force the update
 # when the minor kubernetes version changes in var.kubernetes_version
 
-resource "null_resource" "kubernetes_version_keeper" {
-  triggers = {
+resource "terraform_data" "kubernetes_version_keeper" {
+  triggers_replace = {
     version = var.kubernetes_version
   }
 }
@@ -115,7 +106,7 @@ resource "azapi_update_resource" "aks_cluster_post_create" {
 
   lifecycle {
     ignore_changes       = all
-    replace_triggered_by = [null_resource.kubernetes_version_keeper.id]
+    replace_triggered_by = [terraform_data.kubernetes_version_keeper.id]
   }
 }
 

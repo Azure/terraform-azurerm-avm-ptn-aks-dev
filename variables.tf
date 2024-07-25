@@ -23,8 +23,15 @@ variable "resource_group_name" {
 
 variable "agents_tags" {
   type        = map(string)
-  default     = null
+  default     = {}
   description = "(Optional) A mapping of tags to assign to the Node Pool."
+  nullable    = false
+}
+
+variable "container_registry_name" {
+  type        = string
+  default     = null
+  description = "(Optional) The name of the container registry to use for the AKS cluster."
 }
 
 variable "enable_telemetry" {
@@ -41,6 +48,11 @@ variable "kubernetes_version" {
   type        = string
   default     = null
   description = "(Optional) Specify which Kubernetes release to use. Specify only minor version, such as '1.28'."
+
+  validation {
+    condition     = var.kubernetes_version == null || try(can(regex("^[0-9]+\\.[0-9]+$", var.kubernetes_version)), false)
+    error_message = "Ensure that kubernetes_version does not specify a patch version"
+  }
 }
 
 variable "lock" {
@@ -66,6 +78,11 @@ variable "orchestrator_version" {
   type        = string
   default     = null
   description = "(Optional) Specify which Kubernetes release to use. Specify only minor version, such as '1.28'."
+
+  validation {
+    condition     = var.orchestrator_version == null || try(can(regex("^[0-9]+\\.[0-9]+$", var.orchestrator_version)), false)
+    error_message = "Ensure that orchestrator_version does not specify a patch version"
+  }
 }
 
 variable "rbac_aad_admin_group_object_ids" {
@@ -89,15 +106,20 @@ variable "rbac_aad_tenant_id" {
 # tflint-ignore: terraform_unused_declarations
 variable "tags" {
   type        = map(string)
-  default     = null
+  default     = {}
   description = "(Optional) Tags of the resource."
+  nullable    = false
+}
+
+variable "user_assigned_identity_name" {
+  type        = string
+  default     = null
+  description = "(Optional) The name of the User Assigned Managed Identity to create."
 }
 
 variable "user_assigned_resource_ids" {
   type        = set(string)
   default     = []
-  description = <<DESCRIPTION
-(Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
-  DESCRIPTION
+  description = "(Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource."
   nullable    = false
 }

@@ -29,11 +29,9 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 1.4.0, < 2.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.86.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.86.0, <4.0)
 
-- <a name="requirement_null"></a> [null](#requirement\_null) (>= 3.0)
-
-- <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0)
+- <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
 
 ## Providers
 
@@ -41,11 +39,11 @@ The following providers are used by this module:
 
 - <a name="provider_azapi"></a> [azapi](#provider\_azapi) (>= 1.4.0, < 2.0)
 
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.86.0)
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.86.0, <4.0)
 
-- <a name="provider_null"></a> [null](#provider\_null) (>= 3.0)
+- <a name="provider_random"></a> [random](#provider\_random) (~> 3.5)
 
-- <a name="provider_random"></a> [random](#provider\_random) (>= 3.5.0)
+- <a name="provider_terraform"></a> [terraform](#provider\_terraform)
 
 ## Resources
 
@@ -58,9 +56,9 @@ The following resources are used by this module:
 - [azurerm_resource_group_template_deployment.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group_template_deployment) (resource)
 - [azurerm_role_assignment.acr](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [azurerm_user_assigned_identity.aks](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) (resource)
-- [null_resource.kubernetes_version_keeper](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) (resource)
 - [random_id.telem](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
 - [random_string.acr_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) (resource)
+- [terraform_data.kubernetes_version_keeper](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) (resource)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -94,6 +92,14 @@ The following input variables are optional (have default values):
 Description: (Optional) A mapping of tags to assign to the Node Pool.
 
 Type: `map(string)`
+
+Default: `{}`
+
+### <a name="input_container_registry_name"></a> [container\_registry\_name](#input\_container\_registry\_name)
+
+Description: (Optional) The name of the container registry to use for the AKS cluster.
+
+Type: `string`
 
 Default: `null`
 
@@ -170,6 +176,14 @@ Default: `null`
 Description: (Optional) Tags of the resource.
 
 Type: `map(string)`
+
+Default: `{}`
+
+### <a name="input_user_assigned_identity_name"></a> [user\_assigned\_identity\_name](#input\_user\_assigned\_identity\_name)
+
+Description: (Optional) The name of the User Assigned Managed Identity to create.
+
+Type: `string`
 
 Default: `null`
 
