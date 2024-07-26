@@ -23,9 +23,8 @@ variable "resource_group_name" {
 
 variable "agents_tags" {
   type        = map(string)
-  default     = {}
+  default     = null
   description = "(Optional) A mapping of tags to assign to the Node Pool."
-  nullable    = false
 }
 
 variable "container_registry_name" {
@@ -106,9 +105,8 @@ variable "rbac_aad_tenant_id" {
 # tflint-ignore: terraform_unused_declarations
 variable "tags" {
   type        = map(string)
-  default     = {}
+  default     = null
   description = "(Optional) Tags of the resource."
-  nullable    = false
 }
 
 variable "user_assigned_identity_name" {
