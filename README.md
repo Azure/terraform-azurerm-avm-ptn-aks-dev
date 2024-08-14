@@ -193,7 +193,7 @@ Type: `string`
 
 Default: `null`
 
-### <a name="input_user_assigned_resource_ids"></a> [user\_assigned\_resource\_ids](#input\_user\_assigned\_resource\_ids)
+### <a name="input_user_assigned_managed_identity_resource_ids"></a> [user\_assigned\_managed\_identity\_resource\_ids](#input\_user\_assigned\_managed\_identity\_resource\_ids)
 
 Description: (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
 

@@ -115,7 +115,7 @@ variable "user_assigned_identity_name" {
   description = "(Optional) The name of the User Assigned Managed Identity to create."
 }
 
-variable "user_assigned_resource_ids" {
+variable "user_assigned_managed_identity_resource_ids" {
   type        = set(string)
   default     = []
   description = "(Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource."

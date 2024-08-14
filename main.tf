@@ -22,7 +22,7 @@ resource "azurerm_role_assignment" "acr" {
 }
 
 resource "azurerm_user_assigned_identity" "aks" {
-  count = length(var.user_assigned_resource_ids) > 0 ? 0 : 1
+  count = length(var.user_assigned_managed_identity_resource_ids) > 0 ? 0 : 1
 
   location            = var.location
   name                = coalesce(var.user_assigned_identity_name, "uami-aks")
@@ -68,7 +68,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   }
   identity {
     type         = "UserAssigned"
-    identity_ids = length(var.user_assigned_resource_ids) > 0 ? var.user_assigned_resource_ids : azurerm_user_assigned_identity.aks[*].id
+    identity_ids = length(var.user_assigned_managed_identity_resource_ids) > 0 ? var.user_assigned_managed_identity_resource_ids : azurerm_user_assigned_identity.aks[*].id
   }
   network_profile {
     network_plugin    = "kubenet"
