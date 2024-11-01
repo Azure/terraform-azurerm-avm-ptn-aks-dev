@@ -60,10 +60,14 @@ resource "azurerm_kubernetes_cluster" "this" {
       max_surge = "10%"
     }
   }
-  azure_active_directory_role_based_access_control {
-    admin_group_object_ids = var.rbac_aad_admin_group_object_ids
-    azure_rbac_enabled     = var.rbac_aad_azure_rbac_enabled
-    tenant_id              = var.rbac_aad_tenant_id
+  dynamic "azure_active_directory_role_based_access_control" {
+    for_each = var.rbac_aad_azure_rbac_enabled == true ? [1] : []
+
+    content {
+      admin_group_object_ids = var.rbac_aad_admin_group_object_ids
+      azure_rbac_enabled     = var.rbac_aad_azure_rbac_enabled
+      tenant_id              = var.rbac_aad_tenant_id
+    }
   }
   identity {
     type         = "UserAssigned"
