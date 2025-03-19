@@ -107,7 +107,7 @@ Default: `true`
 
 ### <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version)
 
-Description: (Optional) Specify which Kubernetes release to use. Specify only minor version, such as '1.28'.
+Description: (Optional) Specify which Kubernetes release to use. Specify only minor version, such as '1.30'.
 
 Type: `string`
 
@@ -133,7 +133,7 @@ Default: `null`
 
 ### <a name="input_orchestrator_version"></a> [orchestrator\_version](#input\_orchestrator\_version)
 
-Description: (Optional) Specify which Kubernetes release to use. Specify only minor version, such as '1.28'.
+Description: (Optional) Specify which Kubernetes release to use. Specify only minor version, such as '1.30'.
 
 Type: `string`
 
