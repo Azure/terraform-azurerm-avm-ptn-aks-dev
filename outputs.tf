@@ -3,10 +3,10 @@
 output "resource" {
   description = "This is the full output for the resource."
   sensitive   = true
-  value       = azurerm_kubernetes_cluster.this
+  value       = azapi_resource.managedCluster_this
 }
 
 output "resource_id" {
   description = "The `azurerm_kubernetes_cluster`'s resource id."
-  value       = azurerm_kubernetes_cluster.this.id
+  value       = azapi_resource.managedCluster_this.id
 }
