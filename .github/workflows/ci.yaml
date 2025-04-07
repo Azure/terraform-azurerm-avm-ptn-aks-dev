@@ -1,0 +1,80 @@
+---
+name: 01 Continuous Integration
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      terraform_cli_version:
+        description: 'Terraform CLI Version'
+        required: true
+        default: 'latest'
+        type: string      
+
+jobs:
+  validate:
+    name: Validate Terraform
+    runs-on:
+      self-hosted
+    steps:
+      - name: Validate Terraform
+        uses: ps-devops-summit-2025/demg-mgt-template/.github/actions/validate@main
+        with:
+          root_module_folder_relative_path: '.'
+          terraform_cli_version: ${{ inputs.terraform_cli_version }}
+
+  dev_plan:
+    uses: ps-devops-summit-2025/demg-mgt-template/.github/workflows/ci-template.yaml@main
+    name: Development
+    needs: validate
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      root_module_folder_relative_path: '.'
+      name: dev
+      display_name: Development
+      runner_name: self-hosted
+      environment_name_plan: dev-plan
+      environment_name_apply: dev-apply
+      dependent_environment: 
+      backend_azure_storage_account_container_name: dev
+      terraform_cli_version: ${{ inputs.terraform_cli_version }}
+
+  test_plan:
+    uses: ps-devops-summit-2025/demg-mgt-template/.github/workflows/ci-template.yaml@main
+    name: Test
+    needs: validate
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      root_module_folder_relative_path: '.'
+      name: test
+      display_name: Test
+      runner_name: self-hosted
+      environment_name_plan: test-plan
+      environment_name_apply: test-apply
+      dependent_environment: dev
+      backend_azure_storage_account_container_name: test
+      terraform_cli_version: ${{ inputs.terraform_cli_version }}
+
+  prod_plan:
+    uses: ps-devops-summit-2025/demg-mgt-template/.github/workflows/ci-template.yaml@main
+    name: Production
+    needs: validate
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      root_module_folder_relative_path: '.'
+      name: prod
+      display_name: Production
+      runner_name: self-hosted
+      environment_name_plan: prod-plan
+      environment_name_apply: prod-apply
+      dependent_environment: test
+      backend_azure_storage_account_container_name: prod
+      terraform_cli_version: ${{ inputs.terraform_cli_version }}
+
