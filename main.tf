@@ -46,7 +46,6 @@ resource "azurerm_kubernetes_cluster" "this" {
 
   default_node_pool {
     name                    = "agentpool"
-    vm_size                 = "Standard_DS2_v2"
     auto_scaling_enabled    = true
     host_encryption_enabled = true
     max_count               = 5
@@ -55,6 +54,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     orchestrator_version    = var.orchestrator_version
     os_sku                  = "Ubuntu"
     tags                    = merge(var.tags, var.agents_tags)
+    vm_size                 = "Standard_DS2_v2"
 
     upgrade_settings {
       max_surge = "10%"
@@ -99,13 +99,13 @@ resource "terraform_data" "kubernetes_version_keeper" {
 }
 
 resource "azapi_update_resource" "aks_cluster_post_create" {
-  type = "Microsoft.ContainerService/managedClusters@2024-02-01"
+  resource_id = azurerm_kubernetes_cluster.this.id
+  type        = "Microsoft.ContainerService/managedClusters@2024-02-01"
   body = {
     properties = {
       kubernetesVersion = var.kubernetes_version
     }
   }
-  resource_id = azurerm_kubernetes_cluster.this.id
 
   lifecycle {
     ignore_changes       = all
