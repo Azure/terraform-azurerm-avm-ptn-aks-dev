@@ -6,6 +6,7 @@ This deploys the module in its simplest form.
 ```hcl
 terraform {
   required_version = ">= 1.9, < 2.0"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -31,7 +32,7 @@ provider "azurerm" {
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/regions/azurerm"
-  version = "~> 0.8"
+  version = "0.8.0"
 }
 
 # This allows us to randomize the region for the resource group.
@@ -44,7 +45,7 @@ resource "random_integer" "region_index" {
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "~> 0.3"
+  version = "0.3.0"
 }
 
 # This is required for resource modules
@@ -58,12 +59,13 @@ resource "azurerm_resource_group" "this" {
 # Leaving location as `null` will cause the module to use the resource group location
 # with a data source.
 module "test" {
-  source              = "../../"
-  kubernetes_version  = "1.30"
-  enable_telemetry    = var.enable_telemetry # see variables.tf
+  source = "../../"
+
+  location            = module.regions.regions_by_name.westus2.name
   name                = module.naming.kubernetes_cluster.name_unique
   resource_group_name = azurerm_resource_group.this.name
-  location            = module.regions.regions_by_name.westus2.name
+  enable_telemetry    = var.enable_telemetry # see variables.tf
+  kubernetes_version  = "1.30"
 }
 ```
 
@@ -116,13 +118,13 @@ The following Modules are called:
 
 Source: Azure/naming/azurerm
 
-Version: ~> 0.3
+Version: 0.3.0
 
 ### <a name="module_regions"></a> [regions](#module\_regions)
 
 Source: Azure/regions/azurerm
 
-Version: ~> 0.8
+Version: 0.8.0
 
 ### <a name="module_test"></a> [test](#module\_test)
 

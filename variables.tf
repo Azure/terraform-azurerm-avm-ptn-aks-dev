@@ -33,6 +33,12 @@ variable "container_registry_name" {
   description = "(Optional) The name of the container registry to use for the AKS cluster."
 }
 
+variable "container_registry_sku" {
+  type        = string
+  default     = null
+  description = "(Optional) The SKU of the container registry to use for the AKS cluster. If not specified, the default is 'Premium'."
+}
+
 variable "enable_telemetry" {
   type        = bool
   default     = true
