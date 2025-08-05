@@ -96,6 +96,14 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_container_registry_sku"></a> [container\_registry\_sku](#input\_container\_registry\_sku)
+
+Description: (Optional) The SKU of the container registry to use for the AKS cluster. If not specified, the default is 'Premium'.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
 Description: (Optional) This variable controls whether or not telemetry is enabled for the module.  
@@ -191,6 +199,14 @@ Default: `[]`
 ## Outputs
 
 The following outputs are exported:
+
+### <a name="output_container_registry_resource"></a> [container\_registry\_resource](#output\_container\_registry\_resource)
+
+Description: This is the full output for the container registry resource.
+
+### <a name="output_container_registry_resource_id"></a> [container\_registry\_resource\_id](#output\_container\_registry\_resource\_id)
+
+Description: The `azurerm_kubernetes_cluster`'s resource id.
 
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
