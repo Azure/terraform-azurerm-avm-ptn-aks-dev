@@ -33,6 +33,12 @@ variable "container_registry_name" {
   description = "(Optional) The name of the container registry to use for the AKS cluster."
 }
 
+variable "container_registry_sku" {
+  type        = string
+  default     = null
+  description = "(Optional) The SKU of the container registry to use for the AKS cluster. If not specified, the default is 'Premium'."
+}
+
 variable "enable_telemetry" {
   type        = bool
   default     = true
@@ -121,4 +127,10 @@ variable "user_assigned_managed_identity_resource_ids" {
   default     = []
   description = "(Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource."
   nullable    = false
+}
+
+variable "vm_size" {
+  type = string
+  default = "Standard_DS2_v2"
+  description = "(Optional) The VM SKU for the default node pool."
 }
