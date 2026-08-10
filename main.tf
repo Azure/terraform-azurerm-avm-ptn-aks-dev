@@ -1,4 +1,3 @@
-
 resource "random_string" "acr_suffix" {
   length  = 8
   numeric = true
@@ -60,6 +59,7 @@ resource "azurerm_kubernetes_cluster" "this" {
       max_surge = "10%"
     }
   }
+
   dynamic "azure_active_directory_role_based_access_control" {
     for_each = var.rbac_aad_azure_rbac_enabled == true ? [1] : []
 
@@ -69,10 +69,12 @@ resource "azurerm_kubernetes_cluster" "this" {
       tenant_id              = var.rbac_aad_tenant_id
     }
   }
+
   identity {
     type         = "UserAssigned"
     identity_ids = length(var.user_assigned_managed_identity_resource_ids) > 0 ? var.user_assigned_managed_identity_resource_ids : azurerm_user_assigned_identity.aks[*].id
   }
+
   network_profile {
     network_plugin    = "kubenet"
     load_balancer_sku = "basic"
