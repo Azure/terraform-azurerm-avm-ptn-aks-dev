@@ -66,7 +66,7 @@ module "test" {
   name                = module.naming.kubernetes_cluster.name_unique
   resource_group_name = azurerm_resource_group.this.name
   enable_telemetry    = var.enable_telemetry # see variables.tf
-  kubernetes_version  = "1.30"
+  kubernetes_version  = "1.35"
 }
 ```
 
