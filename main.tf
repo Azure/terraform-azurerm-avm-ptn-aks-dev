@@ -53,7 +53,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     orchestrator_version    = var.orchestrator_version
     os_sku                  = "Ubuntu"
     tags                    = merge(var.tags, var.agents_tags)
-    vm_size                 = "Standard_DS2_v2"
+    vm_size                 = var.vm_size
 
     upgrade_settings {
       max_surge = "10%"
