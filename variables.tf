@@ -122,3 +122,15 @@ variable "user_assigned_managed_identity_resource_ids" {
   description = "(Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource."
   nullable    = false
 }
+
+variable "vm_size" {
+  type        = string
+  default     = "Standard_D2s_v5"
+  description = "(Optional) The size of the Virtual Machines used by the default node pool. Changing this forces a new resource to be created."
+  nullable    = false
+
+  validation {
+    condition     = length(trimspace(var.vm_size)) > 0
+    error_message = "The vm_size must not be empty."
+  }
+}

@@ -188,6 +188,14 @@ Type: `set(string)`
 
 Default: `[]`
 
+### <a name="input_vm_size"></a> [vm\_size](#input\_vm\_size)
+
+Description: (Optional) The size of the Virtual Machines used by the default node pool. Changing this forces a new resource to be created.
+
+Type: `string`
+
+Default: `"Standard_D2s_v5"`
+
 ## Outputs
 
 The following outputs are exported:
