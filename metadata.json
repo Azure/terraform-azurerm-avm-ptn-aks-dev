@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "AKS dev",
+  "moduleDescription": "AVM Pattern Module for AKS dev",
+  "canonicalType": "aks-dev",
+  "owners": [
+    "ms-henglu"
+  ],
+  "telemetryIdPrefix": "46d3xtrf.ptn.77fb5d9"
+}
